@@ -1,0 +1,496 @@
+{{ 'section-faq.css' | asset_url | stylesheet_tag }}
+
+<style>
+  .faq-section {
+    padding: {{ section.settings.section_padding_top }}px 0 {{ section.settings.section_padding_bottom }}px 0;
+    background-color: {{ section.settings.background_color }};
+  }
+
+  .faq-container {
+    max-width: {{ section.settings.container_width }}px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .faq-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .faq-title {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: {{ section.settings.title_color }};
+    margin-bottom: 1rem;
+  }
+
+  .faq-subtitle {
+    font-size: clamp(1rem, 2.5vw, 1.25rem);
+    line-height: 1.5;
+    color: {{ section.settings.subtitle_color }};
+    opacity: 0.8;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .faq-subtitle p {
+    margin: 0;
+  }
+
+  .faq-list {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .faq-item {
+    border-bottom: 1px solid {{ section.settings.border_color }};
+    margin-bottom: 0;
+  }
+
+  .faq-item:last-child {
+    border-bottom: none;
+  }
+
+  .faq-question {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 1.5rem 0;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: clamp(1.1rem, 2.5vw, 1.25rem);
+    font-weight: 600;
+    color: {{ section.settings.question_color }};
+    line-height: 1.4;
+    transition: color 0.3s ease;
+  }
+
+  .faq-question:hover {
+    color: {{ section.settings.question_hover_color }};
+  }
+
+  .faq-question:focus {
+    outline: 2px solid {{ section.settings.question_hover_color }};
+    outline-offset: 2px;
+  }
+
+  .faq-icon {
+    flex-shrink: 0;
+    margin-left: 1rem;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: {{ section.settings.icon_color }};
+    transition: transform 0.3s ease, color 0.3s ease;
+  }
+
+  .faq-item.active .faq-icon {
+    transform: rotate(45deg);
+    color: {{ section.settings.question_hover_color }};
+  }
+
+  .faq-answer {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.4s ease, padding 0.4s ease;
+    padding: 0;
+  }
+
+  .faq-item.active .faq-answer {
+    max-height: 1000px;
+    padding-bottom: 1.5rem;
+  }
+
+  .faq-answer-content {
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    line-height: 1.6;
+    color: {{ section.settings.answer_color }};
+    opacity: 0.9;
+  }
+
+  .faq-answer-content p {
+    margin: 0 0 1rem 0;
+  }
+
+  .faq-answer-content p:last-child {
+    margin-bottom: 0;
+  }
+
+  .faq-answer-content ul,
+  .faq-answer-content ol {
+    margin: 0 0 1rem 1.5rem;
+    padding: 0;
+  }
+
+  .faq-answer-content li {
+    margin-bottom: 0.5rem;
+  }
+
+  /* Mobile Styles */
+  @media screen and (max-width: 768px) {
+    .faq-container {
+      padding: 0 1.5rem;
+    }
+
+    .faq-header {
+      margin-bottom: 2rem;
+    }
+
+    .faq-question {
+      padding: 1.25rem 0;
+    }
+
+    .faq-icon {
+      margin-left: 0.75rem;
+      width: 20px;
+      height: 20px;
+      font-size: 1.25rem;
+    }
+
+    .faq-item.active .faq-answer {
+      padding-bottom: 1.25rem;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .faq-container {
+      padding: 0 1rem;
+    }
+
+    .faq-question {
+      padding: 1rem 0;
+    }
+
+    .faq-item.active .faq-answer {
+      padding-bottom: 1rem;
+    }
+  }
+
+  /* Animação de entrada */
+  .faq-item {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s ease forwards;
+  }
+
+  .faq-item:nth-child(1) { animation-delay: 0.1s; }
+  .faq-item:nth-child(2) { animation-delay: 0.2s; }
+  .faq-item:nth-child(3) { animation-delay: 0.3s; }
+  .faq-item:nth-child(4) { animation-delay: 0.4s; }
+  .faq-item:nth-child(5) { animation-delay: 0.5s; }
+  .faq-item:nth-child(n+6) { animation-delay: 0.6s; }
+
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+
+<section class="faq-section">
+  <div class="faq-container">
+    {%- if section.settings.title != blank or section.settings.subtitle != blank -%}
+      <div class="faq-header">
+        {%- if section.settings.title != blank -%}
+          <h2 class="faq-title">
+            {{ section.settings.title | escape }}
+          </h2>
+        {%- endif -%}
+        
+        {%- if section.settings.subtitle != blank -%}
+          <div class="faq-subtitle">
+            {{ section.settings.subtitle }}
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if section.blocks.size > 0 -%}
+      <div class="faq-list">
+        {%- for block in section.blocks -%}
+          {%- case block.type -%}
+            {%- when 'faq_item' -%}
+              <div class="faq-item" {{ block.shopify_attributes }}>
+                <button 
+                  class="faq-question" 
+                  aria-expanded="false"
+                  aria-controls="faq-answer-{{ forloop.index }}"
+                  type="button"
+                >
+                  <span>{{ block.settings.question | escape }}</span>
+                  <span class="faq-icon">+</span>
+                </button>
+                
+                <div 
+                  class="faq-answer" 
+                  id="faq-answer-{{ forloop.index }}"
+                  aria-hidden="true"
+                >
+                  <div class="faq-answer-content">
+                    {{ block.settings.answer }}
+                  </div>
+                </div>
+              </div>
+          {%- endcase -%}
+        {%- endfor -%}
+      </div>
+    {%- else -%}
+      <div class="faq-list">
+        <div class="faq-item">
+          <button class="faq-question" aria-expanded="false" type="button">
+            <span>Como posso entrar em contato com o suporte?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer" aria-hidden="true">
+            <div class="faq-answer-content">
+              <p>Você pode entrar em contato conosco através do email <strong>suporte@exemplo.com</strong> ou pelo telefone <strong>(11) 1234-5678</strong>. Nosso horário de atendimento é de segunda a sexta, das 9h às 18h.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const faqItems = document.querySelectorAll('.faq-item');
+    
+    faqItems.forEach(item => {
+      const question = item.querySelector('.faq-question');
+      const answer = item.querySelector('.faq-answer');
+      const icon = item.querySelector('.faq-icon');
+      
+      question.addEventListener('click', function() {
+        const isActive = item.classList.contains('active');
+        
+        // Fechar todas as outras FAQs se a configuração permitir apenas uma aberta
+        {% if section.settings.allow_multiple_open == false %}
+        faqItems.forEach(otherItem => {
+          if (otherItem !== item) {
+            otherItem.classList.remove('active');
+            otherItem.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+            otherItem.querySelector('.faq-answer').setAttribute('aria-hidden', 'true');
+          }
+        });
+        {% endif %}
+        
+        // Toggle do item atual
+        if (isActive) {
+          item.classList.remove('active');
+          question.setAttribute('aria-expanded', 'false');
+          answer.setAttribute('aria-hidden', 'true');
+        } else {
+          item.classList.add('active');
+          question.setAttribute('aria-expanded', 'true');
+          answer.setAttribute('aria-hidden', 'false');
+        }
+      });
+    });
+    
+    // Abrir primeira FAQ se configurado
+    {% if section.settings.open_first_item %}
+    if (faqItems.length > 0) {
+      const firstItem = faqItems[0];
+      const firstQuestion = firstItem.querySelector('.faq-question');
+      const firstAnswer = firstItem.querySelector('.faq-answer');
+      
+      firstItem.classList.add('active');
+      firstQuestion.setAttribute('aria-expanded', 'true');
+      firstAnswer.setAttribute('aria-hidden', 'false');
+    }
+    {% endif %}
+  });
+</script>
+
+{% schema %}
+{
+  "name": "FAQ",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Conteúdo"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título da Seção",
+      "default": "Perguntas Frequentes"
+    },
+    {
+      "type": "richtext",
+      "id": "subtitle",
+      "label": "Subtítulo/Descrição",
+      "default": "<p>Encontre respostas para as dúvidas mais comuns sobre nossos produtos e serviços.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Comportamento"
+    },
+    {
+      "type": "checkbox",
+      "id": "allow_multiple_open",
+      "label": "Permitir múltiplas FAQs abertas",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "open_first_item",
+      "label": "Abrir primeiro item por padrão",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "container_width",
+      "label": "Largura do Container",
+      "min": 600,
+      "max": 1400,
+      "step": 50,
+      "default": 1000,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top",
+      "label": "Padding Superior",
+      "min": 0,
+      "max": 120,
+      "step": 10,
+      "default": 60,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom",
+      "label": "Padding Inferior",
+      "min": 0,
+      "max": 120,
+      "step": 10,
+      "default": 60,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Cores"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Cor de Fundo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Cor do Título",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "Cor do Subtítulo",
+      "default": "#666666"
+    },
+    {
+      "type": "color",
+      "id": "question_color",
+      "label": "Cor das Perguntas",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "question_hover_color",
+      "label": "Cor das Perguntas (Hover)",
+      "default": "#0066cc"
+    },
+    {
+      "type": "color",
+      "id": "answer_color",
+      "label": "Cor das Respostas",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Cor das Bordas",
+      "default": "#e0e0e0"
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Cor dos Ícones",
+      "default": "#666666"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq_item",
+      "name": "Item FAQ",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Pergunta",
+          "default": "Qual é a sua política de devolução?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Resposta",
+          "default": "<p>Aceitamos devoluções em até 30 dias após a compra, desde que o produto esteja em perfeitas condições e com a nota fiscal.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "FAQ",
+      "blocks": [
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "Como posso acompanhar meu pedido?",
+            "answer": "<p>Após a confirmação do pagamento, você receberá um email com o código de rastreamento para acompanhar sua entrega em tempo real.</p>"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "Qual é o prazo de entrega?",
+            "answer": "<p>O prazo de entrega varia de acordo com sua localização:</p><ul><li>Região Sudeste: 2-4 dias úteis</li><li>Região Sul: 3-5 dias úteis</li><li>Demais regiões: 5-10 dias úteis</li></ul>"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "Vocês fazem entrega internacional?",
+            "answer": "<p>Atualmente realizamos entregas apenas no território nacional. Estamos trabalhando para expandir nossos serviços internacionalmente em breve.</p>"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "Como entrar em contato com o suporte?",
+            "answer": "<p>Você pode nos contatar através de:</p><ul><li>Email: <strong>suporte@exemplo.com</strong></li><li>WhatsApp: <strong>(11) 99999-9999</strong></li><li>Chat online no site</li></ul><p>Horário de atendimento: Segunda a sexta, das 9h às 18h.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

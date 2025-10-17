@@ -1,0 +1,381 @@
+{{ 'section-lifestyle-campaign.css' | asset_url | stylesheet_tag }}
+
+<style>
+  .lifestyle-campaign {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    overflow: hidden;
+    background-color: #f5f5f5;
+  }
+
+  /* Desktop image */
+  .lifestyle-campaign__image-desktop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    z-index: 1;
+    display: block;
+  }
+
+  /* Mobile image */
+  .lifestyle-campaign__image-mobile {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    z-index: 1;
+    display: none;
+  }
+
+  .lifestyle-campaign__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    background-color: {{ section.settings.overlay_color | default: '#000000' }};
+    opacity: {{ section.settings.overlay_intensity | default: 30 | divided_by: 100.0 }};
+  }
+
+  .lifestyle-campaign__content {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    padding: 3rem 2rem;
+    text-align: center;
+    color: white;
+  }
+
+  .lifestyle-campaign__brand {
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  }
+
+  .lifestyle-campaign__tagline {
+    font-size: clamp(1rem, 3vw, 1.5rem);
+    line-height: 1.3;
+    margin-bottom: 2rem;
+    font-weight: 400;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+    opacity: 0.95;
+  }
+
+  .lifestyle-campaign__tagline p {
+    margin: 0;
+  }
+
+  .lifestyle-campaign__cta {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    background-color: rgba(255, 255, 255, 0.95);
+    color: #333;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    text-transform: lowercase;
+    letter-spacing: 0.3px;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .lifestyle-campaign__cta:hover {
+    background-color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    color: #333;
+    text-decoration: none;
+    scale: 1.05;
+  }
+
+  /* Desktop Styles */
+  @media screen and (min-width: 769px) {
+    .lifestyle-campaign {
+      {% if section.settings.image_desktop %}
+        aspect-ratio: {{ section.settings.image_desktop.aspect_ratio | default: 1.6 }};
+        min-height: {{ section.settings.section_height_desktop | default: 600 }}px;
+      {% else %}
+        min-height: 600px;
+      {% endif %}
+    }
+    
+    .lifestyle-campaign__content {
+      padding: 4rem 3rem;
+    }
+  }
+
+  /* Mobile Styles */
+  @media screen and (max-width: 768px) {
+    .lifestyle-campaign__image-desktop {
+      display: none;
+    }
+
+    .lifestyle-campaign__image-mobile {
+      display: block;
+    }
+
+    .lifestyle-campaign {
+      {% if section.settings.image_mobile %}
+        aspect-ratio: {{ section.settings.image_mobile.aspect_ratio | default: 0.67 }};
+        min-height: 500px;
+      {% else %}
+        min-height: 400px;
+        aspect-ratio: 0.67;
+      {% endif %}
+    }
+
+    .lifestyle-campaign__content {
+      padding: 2rem 1.5rem;
+    }
+
+    .lifestyle-campaign__brand {
+      margin-bottom: 0.75rem;
+    }
+
+    .lifestyle-campaign__tagline {
+      margin-bottom: 1.5rem;
+    }
+
+    .lifestyle-campaign__cta {
+      padding: 0.875rem 2rem;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .lifestyle-campaign {
+      {% if section.settings.image_mobile %}
+        min-height: 400px;
+      {% else %}
+        min-height: 350px;
+      {% endif %}
+    }
+
+    .lifestyle-campaign__content {
+      padding: 1.5rem 1rem;
+    }
+
+    .lifestyle-campaign__cta {
+      padding: 0.75rem 1.75rem;
+    }
+  }
+
+  /* High-resolution displays */
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .lifestyle-campaign__image-desktop,
+    .lifestyle-campaign__image-mobile {
+      image-rendering: -webkit-optimize-contrast;
+    }
+  }
+</style>
+
+<section class="lifestyle-campaign">
+  {%- comment -%} Desktop Image {%- endcomment -%}
+  {%- if section.settings.image_desktop != blank -%}
+    {{
+      section.settings.image_desktop
+      | image_url: width: 1920
+      | image_tag:
+        loading: 'lazy',
+        class: 'lifestyle-campaign__image-desktop',
+        alt: section.settings.image_desktop.alt | default: section.settings.brand_name,
+        width: section.settings.image_desktop.width,
+        height: section.settings.image_desktop.height
+    }}
+  {%- endif -%}
+
+  {%- comment -%} Mobile Image {%- endcomment -%}
+  {%- if section.settings.image_mobile != blank -%}
+    {{
+      section.settings.image_mobile
+      | image_url: width: 900
+      | image_tag:
+        loading: 'lazy',
+        class: 'lifestyle-campaign__image-mobile',
+        alt: section.settings.image_mobile.alt | default: section.settings.brand_name,
+        width: section.settings.image_mobile.width,
+        height: section.settings.image_mobile.height
+    }}
+  {%- endif -%}
+
+  <div class="lifestyle-campaign__overlay"></div>
+
+  <div class="lifestyle-campaign__content">
+    {%- if section.settings.brand_name != blank -%}
+      <h2 class="lifestyle-campaign__brand">
+        {{ section.settings.brand_name | escape }}
+      </h2>
+    {%- endif -%}
+
+    {%- if section.settings.tagline != blank -%}
+      <div class="lifestyle-campaign__tagline">
+        {{ section.settings.tagline }}
+      </div>
+    {%- endif -%}
+
+    {%- if section.settings.cta_label != blank and section.settings.cta_url != blank -%}
+      <a href="{{ section.settings.cta_url }}" class="lifestyle-campaign__cta">
+        {{ section.settings.cta_label | escape }}
+      </a>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Lifestyle Campaign",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Imagens"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_desktop",
+      "label": "Imagem Desktop",
+      "info": "Recomendado: 1920x800px ou 1920x1200px para melhor qualidade"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Imagem Mobile",
+      "info": "Recomendado: 900x1350px (formato vertical) para melhor qualidade no celular"
+    },
+    {
+      "type": "header",
+      "content": "Overlay"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Cor do Overlay",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_intensity",
+      "label": "Intensidade do Overlay",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "default": 30,
+      "unit": "%"
+    },
+    {
+      "type": "header",
+      "content": "Conteúdo"
+    },
+    {
+      "type": "text",
+      "id": "brand_name",
+      "label": "Nome da Marca/Título",
+      "default": "GO-GETTER"
+    },
+    {
+      "type": "richtext",
+      "id": "tagline",
+      "label": "Tagline/Slogan",
+      "default": "<p>não deixa nada te parar ☕ ✨</p>"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Texto do Botão",
+      "default": "conhecer go-getter"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "URL do Botão"
+    },
+    {
+      "type": "header",
+      "content": "Configurações da Seção"
+    },
+    {
+      "type": "range",
+      "id": "section_height_desktop",
+      "label": "Altura Mínima Desktop",
+      "min": 400,
+      "max": 1000,
+      "step": 50,
+      "default": 600,
+      "unit": "px",
+      "info": "Altura mínima para desktop. A seção se adaptará automaticamente ao aspect ratio da imagem."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Lifestyle Campaign"
+    }
+  ]
+}
+{% endschema %}
+
+<script>
+  // Adaptação dinâmica baseada nas dimensões das imagens
+  document.addEventListener('DOMContentLoaded', function() {
+    const campaignSection = document.querySelector('.lifestyle-campaign');
+    
+    if (campaignSection) {
+      // Função para ajustar altura baseada na imagem visível
+      function adjustSectionHeight() {
+        const isMobile = window.innerWidth <= 768;
+        const activeImage = isMobile ? 
+          campaignSection.querySelector('.lifestyle-campaign__image-mobile') :
+          campaignSection.querySelector('.lifestyle-campaign__image-desktop');
+        
+        if (activeImage && activeImage.complete) {
+          const aspectRatio = activeImage.naturalWidth / activeImage.naturalHeight;
+          const containerWidth = campaignSection.offsetWidth;
+          const calculatedHeight = containerWidth / aspectRatio;
+          
+          // Definir altura mínima baseada no dispositivo
+          const minHeight = isMobile ? 400 : {{ section.settings.section_height_desktop | default: 600 }};
+          const finalHeight = Math.max(calculatedHeight, minHeight);
+          
+          campaignSection.style.height = finalHeight + 'px';
+        }
+      }
+      
+      // Ajustar na carga inicial
+      setTimeout(adjustSectionHeight, 100);
+      
+      // Ajustar no redimensionamento da janela
+      let resizeTimeout;
+      window.addEventListener('resize', function() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(adjustSectionHeight, 250);
+      });
+      
+      // Ajustar quando as imagens carregarem
+      const images = campaignSection.querySelectorAll('img');
+      images.forEach(img => {
+        if (img.complete) {
+          adjustSectionHeight();
+        } else {
+          img.addEventListener('load', adjustSectionHeight);
+        }
+      });
+    }
+  });
+</script>

@@ -1,0 +1,117 @@
+<style>
+  .simple-banner{position:relative;display:block;width:100%;overflow:hidden}
+  .simple-banner__link{display:block;width:100%;height:100%;text-decoration:none}
+  .simple-banner__image{width:100%;height:auto;display:block}
+</style>
+
+{%- liquid
+  assign is_hero = false
+  
+  if template.name == 'index'
+    if section.settings.is_hero_banner == true
+      assign is_hero = true
+    endif
+  endif
+-%}
+
+<section class="simple-banner" data-section-id="{{ section.id }}" data-section-type="editorial-campaign">
+  {%- if section.settings.url != blank -%}
+    <a href="{{ section.settings.url }}" class="simple-banner__link" aria-label="Banner link">
+  {%- endif -%}
+  
+  {%- if section.settings.image_desktop != blank or section.settings.image_mobile != blank -%}
+    <picture>
+      {%- comment -%}WebP para mobile{%- endcomment -%}
+      {%- if section.settings.image_mobile != blank -%}
+        <source 
+          type="image/webp"
+          media="(max-width: 768px)" 
+          srcset="{{ section.settings.image_mobile | image_url: width: 768, format: 'pjpg' }} 768w,
+                  {{ section.settings.image_mobile | image_url: width: 640, format: 'pjpg' }} 640w,
+                  {{ section.settings.image_mobile | image_url: width: 480, format: 'pjpg' }} 480w"
+          sizes="100vw">
+        
+        <source 
+          media="(max-width: 768px)" 
+          srcset="{{ section.settings.image_mobile | image_url: width: 768 }} 768w,
+                  {{ section.settings.image_mobile | image_url: width: 640 }} 640w,
+                  {{ section.settings.image_mobile | image_url: width: 480 }} 480w"
+          sizes="100vw">
+      {%- endif -%}
+      
+      {%- comment -%}WebP para desktop{%- endcomment -%}
+      {%- if section.settings.image_desktop != blank -%}
+        <source 
+          type="image/webp"
+          media="(min-width: 769px)"
+          srcset="{{ section.settings.image_desktop | image_url: width: 1920, format: 'pjpg' }} 1920w,
+                  {{ section.settings.image_desktop | image_url: width: 1440, format: 'pjpg' }} 1440w,
+                  {{ section.settings.image_desktop | image_url: width: 1024, format: 'pjpg' }} 1024w"
+          sizes="100vw">
+        
+        <img 
+          src="{{ section.settings.image_desktop | image_url: width: 1920 }}"
+          srcset="{{ section.settings.image_desktop | image_url: width: 1920 }} 1920w,
+                  {{ section.settings.image_desktop | image_url: width: 1440 }} 1440w,
+                  {{ section.settings.image_desktop | image_url: width: 1024 }} 1024w"
+          sizes="100vw"
+          alt="{{ section.settings.image_desktop.alt | default: 'Banner' | escape }}"
+          class="simple-banner__image"
+          width="{{ section.settings.image_desktop.width }}"
+          height="{{ section.settings.image_desktop.height }}"
+          {%- if is_hero -%}
+            loading="eager"
+            fetchpriority="high"
+            decoding="sync"
+          {%- else -%}
+            loading="lazy"
+            decoding="async"
+          {%- endif -%}>
+      {%- endif -%}
+    </picture>
+  {%- endif -%}
+  
+  {%- if section.settings.url != blank -%}
+    </a>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Banner Simples",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image_desktop",
+      "label": "Banner Desktop",
+      "info": "Recomendado: 1920px de largura, formato WebP ou JPG otimizado"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Banner Mobile",
+      "info": "Recomendado: 768px de largura, formato WebP ou JPG otimizado"
+    },
+    {
+      "type": "url",
+      "id": "url",
+      "label": "Link do Banner",
+      "info": "Para onde o banner deve levar ao ser clicado"
+    },
+    {
+      "type": "checkbox",
+      "id": "is_hero_banner",
+      "label": "Este é o Hero Banner (primeiro banner da página)",
+      "default": false,
+      "info": "⚠️ IMPORTANTE: Marque APENAS para o primeiro banner da homepage para melhorar a performance (LCP). Deixe desmarcado para os outros banners."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Banner Simples"
+    }
+  ]
+}
+{% endschema %}

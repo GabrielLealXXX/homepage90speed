@@ -1,0 +1,543 @@
+{{ 'section-infinite-benefits.css' | asset_url | stylesheet_tag }}
+
+<style>
+  .infinite-benefits {
+    width: 100%;
+    background-color: {{ section.settings.background_color | default: '#000000' }};
+    color: {{ section.settings.text_color | default: '#ffffff' }};
+    padding: {{ section.settings.section_padding | default: 15 }}px 0;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .infinite-benefits__container {
+    display: flex;
+    animation: infiniteScroll {{ section.settings.scroll_speed | default: 30 }}s linear infinite;
+    width: calc(200% + 200px);
+  }
+
+  .infinite-benefits__track {
+    display: flex;
+    align-items: center;
+    gap: {{ section.settings.item_spacing | default: 80 }}px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding-right: {{ section.settings.item_spacing | default: 80 }}px;
+  }
+
+  .infinite-benefits__item {
+    display: flex;
+    align-items: center;
+    gap: {{ section.settings.icon_text_gap | default: 12 }}px;
+    font-size: {{ section.settings.font_size | default: 14 }}px;
+    font-weight: {{ section.settings.font_weight | default: 500 }};
+    color: inherit;
+    flex-shrink: 0;
+  }
+
+  .infinite-benefits__icon {
+    width: {{ section.settings.icon_size | default: 18 }}px;
+    height: {{ section.settings.icon_size | default: 18 }}px;
+    flex-shrink: 0;
+  }
+
+  .infinite-benefits__icon svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+  }
+
+  .infinite-benefits__text {
+    white-space: nowrap;
+    text-transform: {{ section.settings.text_transform | default: 'uppercase' }};
+    letter-spacing: {{ section.settings.letter_spacing | default: 0.5 }}px;
+  }
+
+  @keyframes infiniteScroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* Pause animation on hover */
+  .infinite-benefits:hover .infinite-benefits__container {
+    animation-play-state: {{ section.settings.pause_on_hover | default: 'paused' }};
+  }
+
+  /* Mobile adjustments */
+  @media screen and (max-width: 768px) {
+    .infinite-benefits {
+      padding: {{ section.settings.section_padding_mobile | default: 12 }}px 0;
+    }
+
+    .infinite-benefits__item {
+      font-size: {{ section.settings.font_size_mobile | default: 12 }}px;
+      gap: {{ section.settings.icon_text_gap_mobile | default: 8 }}px;
+    }
+
+    .infinite-benefits__icon {
+      width: {{ section.settings.icon_size_mobile | default: 14 }}px;
+      height: {{ section.settings.icon_size_mobile | default: 14 }}px;
+    }
+
+    .infinite-benefits__icon svg {
+      width: 100%;
+      height: 100%;
+      fill: currentColor;
+    }
+
+    .infinite-benefits__track {
+      gap: {{ section.settings.item_spacing_mobile | default: 50 }}px;
+      padding-right: {{ section.settings.item_spacing_mobile | default: 50 }}px;
+    }
+  }
+</style>
+
+<section class="infinite-benefits">
+  <div class="infinite-benefits__container">
+    <!-- First track -->
+    <div class="infinite-benefits__track">
+      {%- if section.settings.benefit_1_text != blank -%}
+        <div class="infinite-benefits__item">
+          {%- if section.settings.benefit_1_icon != blank -%}
+            <div class="infinite-benefits__icon">{{ section.settings.benefit_1_icon }}</div>
+          {%- else -%}
+            <svg class="infinite-benefits__icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 7h-3V6a4 4 0 0 0-8 0v1H5a1 1 0 0 0-1 1v11a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V8a1 1 0 0 0-1-1zM10 6a2 2 0 0 1 4 0v1h-4V6zm8 13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V9h2v1a1 1 0 0 0 2 0V9h4v1a1 1 0 0 0 2 0V9h2v10z"/>
+            </svg>
+          {%- endif -%}
+          <span class="infinite-benefits__text">{{ section.settings.benefit_1_text }}</span>
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.benefit_2_text != blank -%}
+        <div class="infinite-benefits__item">
+          {%- if section.settings.benefit_2_icon != blank -%}
+            <div class="infinite-benefits__icon">{{ section.settings.benefit_2_icon }}</div>
+          {%- else -%}
+            <svg class="infinite-benefits__icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm5 11h-4v4a1 1 0 0 1-2 0V13H7a1 1 0 0 1 0-2h4V7a1 1 0 0 1 2 0v4h4a1 1 0 0 1 0 2z"/>
+            </svg>
+          {%- endif -%}
+          <span class="infinite-benefits__text">{{ section.settings.benefit_2_text }}</span>
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.benefit_3_text != blank -%}
+        <div class="infinite-benefits__item">
+          {%- if section.settings.benefit_3_icon != blank -%}
+            <div class="infinite-benefits__icon">{{ section.settings.benefit_3_icon }}</div>
+          {%- else -%}
+            <svg class="infinite-benefits__icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
+            </svg>
+          {%- endif -%}
+          <span class="infinite-benefits__text">{{ section.settings.benefit_3_text }}</span>
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.benefit_4_text != blank -%}
+        <div class="infinite-benefits__item">
+          {%- if section.settings.benefit_4_icon != blank -%}
+            <div class="infinite-benefits__icon">{{ section.settings.benefit_4_icon }}</div>
+          {%- else -%}
+            <svg class="infinite-benefits__icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm4.5 7.5L13 13l-1.5-1.5-2 2L8 12l-1.5 1.5L10 17l6.5-6.5z"/>
+            </svg>
+          {%- endif -%}
+          <span class="infinite-benefits__text">{{ section.settings.benefit_4_text }}</span>
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.benefit_5_text != blank -%}
+        <div class="infinite-benefits__item">
+          {%- if section.settings.benefit_5_icon != blank -%}
+            <div class="infinite-benefits__icon">{{ section.settings.benefit_5_icon }}</div>
+          {%- else -%}
+            <svg class="infinite-benefits__icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm4-8a4 4 0 1 1-4-4 4 4 0 0 1 4 4z"/>
+            </svg>
+          {%- endif -%}
+          <span class="infinite-benefits__text">{{ section.settings.benefit_5_text }}</span>
+        </div>
+      {%- endif -%}
+    </div>
+
+    <!-- Duplicate track for seamless infinite scroll -->
+    <div class="infinite-benefits__track">
+      {%- if section.settings.benefit_1_text != blank -%}
+        <div class="infinite-benefits__item">
+          {%- if section.settings.benefit_1_icon != blank -%}
+            <div class="infinite-benefits__icon">{{ section.settings.benefit_1_icon }}</div>
+          {%- else -%}
+            <svg class="infinite-benefits__icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 7h-3V6a4 4 0 0 0-8 0v1H5a1 1 0 0 0-1 1v11a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V8a1 1 0 0 0-1-1zM10 6a2 2 0 0 1 4 0v1h-4V6zm8 13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V9h2v1a1 1 0 0 0 2 0V9h4v1a1 1 0 0 0 2 0V9h2v10z"/>
+            </svg>
+          {%- endif -%}
+          <span class="infinite-benefits__text">{{ section.settings.benefit_1_text }}</span>
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.benefit_2_text != blank -%}
+        <div class="infinite-benefits__item">
+          {%- if section.settings.benefit_2_icon != blank -%}
+            <div class="infinite-benefits__icon">{{ section.settings.benefit_2_icon }}</div>
+          {%- else -%}
+            <svg class="infinite-benefits__icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm5 11h-4v4a1 1 0 0 1-2 0V13H7a1 1 0 0 1 0-2h4V7a1 1 0 0 1 2 0v4h4a1 1 0 0 1 0 2z"/>
+            </svg>
+          {%- endif -%}
+          <span class="infinite-benefits__text">{{ section.settings.benefit_2_text }}</span>
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.benefit_3_text != blank -%}
+        <div class="infinite-benefits__item">
+          {%- if section.settings.benefit_3_icon != blank -%}
+            <div class="infinite-benefits__icon">{{ section.settings.benefit_3_icon }}</div>
+          {%- else -%}
+            <svg class="infinite-benefits__icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
+            </svg>
+          {%- endif -%}
+          <span class="infinite-benefits__text">{{ section.settings.benefit_3_text }}</span>
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.benefit_4_text != blank -%}
+        <div class="infinite-benefits__item">
+          {%- if section.settings.benefit_4_icon != blank -%}
+            <div class="infinite-benefits__icon">{{ section.settings.benefit_4_icon }}</div>
+          {%- else -%}
+            <svg class="infinite-benefits__icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm4.5 7.5L13 13l-1.5-1.5-2 2L8 12l-1.5 1.5L10 17l6.5-6.5z"/>
+            </svg>
+          {%- endif -%}
+          <span class="infinite-benefits__text">{{ section.settings.benefit_4_text }}</span>
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.benefit_5_text != blank -%}
+        <div class="infinite-benefits__item">
+          {%- if section.settings.benefit_5_icon != blank -%}
+            <div class="infinite-benefits__icon">{{ section.settings.benefit_5_icon }}</div>
+          {%- else -%}
+            <svg class="infinite-benefits__icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm4-8a4 4 0 1 1-4-4 4 4 0 0 1 4 4z"/>
+            </svg>
+          {%- endif -%}
+          <span class="infinite-benefits__text">{{ section.settings.benefit_5_text }}</span>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Benefícios Infinitos",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Configurações Visuais"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Cor de Fundo",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Cor do Texto",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "label": "Padding da Seção (Desktop)",
+      "min": 5,
+      "max": 50,
+      "step": 1,
+      "default": 15,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_mobile",
+      "label": "Padding da Seção (Mobile)",
+      "min": 5,
+      "max": 30,
+      "step": 1,
+      "default": 12,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Configurações da Animação"
+    },
+    {
+      "type": "range",
+      "id": "scroll_speed",
+      "label": "Velocidade do Scroll",
+      "min": 10,
+      "max": 60,
+      "step": 2,
+      "default": 30,
+      "unit": "s",
+      "info": "Menor = Mais rápido / Maior = Mais lento"
+    },
+    {
+      "type": "select",
+      "id": "pause_on_hover",
+      "label": "Pausar ao Passar o Mouse",
+      "options": [
+        {
+          "value": "paused",
+          "label": "Sim"
+        },
+        {
+          "value": "running",
+          "label": "Não"
+        }
+      ],
+      "default": "paused"
+    },
+    {
+      "type": "header",
+      "content": "Espaçamento e Tamanhos"
+    },
+    {
+      "type": "range",
+      "id": "item_spacing",
+      "label": "Espaçamento Entre Itens (Desktop)",
+      "min": 30,
+      "max": 150,
+      "step": 10,
+      "default": 80,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "item_spacing_mobile",
+      "label": "Espaçamento Entre Itens (Mobile)",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "default": 50,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "label": "Tamanho do Ícone (Desktop)",
+      "min": 12,
+      "max": 30,
+      "step": 2,
+      "default": 18,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "icon_size_mobile",
+      "label": "Tamanho do Ícone (Mobile)",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "default": 14,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "icon_text_gap",
+      "label": "Espaço Ícone-Texto (Desktop)",
+      "min": 5,
+      "max": 25,
+      "step": 1,
+      "default": 12,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "icon_text_gap_mobile",
+      "label": "Espaço Ícone-Texto (Mobile)",
+      "min": 4,
+      "max": 15,
+      "step": 1,
+      "default": 8,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Tipografia"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "label": "Tamanho da Fonte (Desktop)",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "default": 14,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "font_size_mobile",
+      "label": "Tamanho da Fonte (Mobile)",
+      "min": 8,
+      "max": 18,
+      "step": 1,
+      "default": 12,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "font_weight",
+      "label": "Peso da Fonte",
+      "options": [
+        {
+          "value": "400",
+          "label": "Normal"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semi Bold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "500"
+    },
+    {
+      "type": "select",
+      "id": "text_transform",
+      "label": "Transformação do Texto",
+      "options": [
+        {
+          "value": "none",
+          "label": "Normal"
+        },
+        {
+          "value": "uppercase",
+          "label": "MAIÚSCULAS"
+        },
+        {
+          "value": "lowercase",
+          "label": "minúsculas"
+        },
+        {
+          "value": "capitalize",
+          "label": "Primeira Maiúscula"
+        }
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "range",
+      "id": "letter_spacing",
+      "label": "Espaçamento Entre Letras",
+      "min": 0,
+      "max": 3,
+      "step": 0.1,
+      "default": 0.5,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Benefício 1"
+    },
+    {
+      "type": "text",
+      "id": "benefit_1_text",
+      "label": "Texto do Benefício 1",
+      "default": "🚚 FRETE GRÁTIS A PARTIR DE R$349"
+    },
+    {
+      "type": "html",
+      "id": "benefit_1_icon",
+      "label": "Ícone Personalizado 1 (SVG)",
+      "info": "Cole aqui o código SVG do ícone. Deixe vazio para usar o ícone padrão. Remova fill='#cor' para herdar a cor do tema."
+    },
+    {
+      "type": "header",
+      "content": "Benefício 2"
+    },
+    {
+      "type": "text",
+      "id": "benefit_2_text",
+      "label": "Texto do Benefício 2",
+      "default": "💳 5% OFF NO PIX"
+    },
+    {
+      "type": "html",
+      "id": "benefit_2_icon",
+      "label": "Ícone Personalizado 2 (SVG)",
+      "info": "Cole aqui o código SVG do ícone. Deixe vazio para usar o ícone padrão. Remova fill='#cor' para herdar a cor do tema."
+    },
+    {
+      "type": "header",
+      "content": "Benefício 3"
+    },
+    {
+      "type": "text",
+      "id": "benefit_3_text",
+      "label": "Texto do Benefício 3",
+      "default": "🔄 TROCA RÁPIDA E GRÁTIS"
+    },
+    {
+      "type": "html",
+      "id": "benefit_3_icon",
+      "label": "Ícone Personalizado 3 (SVG)",
+      "info": "Cole aqui o código SVG do ícone. Deixe vazio para usar o ícone padrão. Remova fill='#cor' para herdar a cor do tema."
+    },
+    {
+      "type": "header",
+      "content": "Benefício 4 (Opcional)"
+    },
+    {
+      "type": "text",
+      "id": "benefit_4_text",
+      "label": "Texto do Benefício 4"
+    },
+    {
+      "type": "html",
+      "id": "benefit_4_icon",
+      "label": "Ícone Personalizado 4 (SVG)",
+      "info": "Remova fill='#cor' para herdar a cor do tema."
+    },
+    {
+      "type": "header",
+      "content": "Benefício 5 (Opcional)"
+    },
+    {
+      "type": "text",
+      "id": "benefit_5_text",
+      "label": "Texto do Benefício 5"
+    },
+    {
+      "type": "html",
+      "id": "benefit_5_icon",
+      "label": "Ícone Personalizado 5 (SVG)",
+      "info": "Remova fill='#cor' para herdar a cor do tema."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Benefícios Infinitos"
+    }
+  ]
+}
+{% endschema %}
