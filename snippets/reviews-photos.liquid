@@ -1,0 +1,180 @@
+{% comment %}
+  Snippet: reviews-photos.liquid
+  Carrossel de fotos das avaliações
+  Uso: {% render 'reviews-photos', product: product %}
+{% endcomment %}
+
+{%- assign reviews_data = product.metafields.reviews.all_reviews.value -%}
+{%- assign fake_total_count = product.metafields.custom.total_de_avaliacoes.value | default: product.metafields.reviews.total_count.value -%}
+
+{% if reviews_data and fake_total_count and fake_total_count > 0 %}
+  {%- assign reviews = reviews_data | parse_json -%}
+  
+  {%- comment -%} Coleta fotos das reviews usando mesma lógica do avaliacoes-automaticas {%- endcomment -%}
+  {%- assign review_photos = array -%}
+  {%- for review in reviews -%}
+    {%- if review.photo_url and review.photo_url != '' -%}
+      {%- assign photo_data = review.photo_url | append: '|' | append: forloop.index -%}
+      {%- assign review_photos = review_photos | append: photo_data -%}
+      {%- unless forloop.last -%}
+        {%- assign review_photos = review_photos | append: ',' -%}
+      {%- endunless -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- assign review_photos = review_photos | split: ',' -%}
+  
+  {% if review_photos.size > 0 %}
+    <div class="reviews-photos-container">
+      <div class="reviews-photos-header">
+        <span class="reviews-title">Avaliações ({{ fake_total_count }})</span>
+        <div class="reviews-stars">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+          </svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+          </svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+          </svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+          </svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+          </svg>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="arrow-right">
+          <polyline points="9,18 15,12 9,6"></polyline>
+        </svg>
+      </div>
+      
+      <div class="reviews-photos-scroll" onclick="scrollToReviews()">
+        {%- for photo in review_photos limit: 4 -%}
+          <div class="photo-item">
+            <img src="{{ photo }}" alt="Avaliação" loading="lazy">
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+
+    <style>
+      .reviews-photos-container {
+        margin: 16px 0;
+        background: #f8f8f8;
+        border-radius: 8px;
+        padding: 16px 20px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      
+      .reviews-photos-container:hover {
+        background: #f0f0f0;
+      }
+      
+      .reviews-photos-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+      
+      .reviews-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: #7a7a7a;
+        margin: 0;
+      }
+      
+      .reviews-stars {
+        display: flex;
+        gap: 1px;
+        color: #F2C832;
+        margin-right: auto;
+        margin-left: 8px;
+      }
+      
+      .arrow-right {
+        color: #666;
+        flex-shrink: 0;
+      }
+      
+      .reviews-photos-scroll {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 4px;
+      }
+      
+      .reviews-photos-scroll::-webkit-scrollbar {
+        height: 3px;
+      }
+      
+      .reviews-photos-scroll::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      
+      .reviews-photos-scroll::-webkit-scrollbar-thumb {
+        background: #ddd;
+        border-radius: 3px;
+      }
+      
+      .photo-item {
+        flex: 0 0 72px;
+        height: 72px;
+        border-radius: 6px;
+        overflow: hidden;
+        background: #fff;
+      }
+      
+      .photo-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      
+      @media (max-width: 768px) {
+        .reviews-photos-container {
+          margin: 12px -20px 16px -20px;
+          border-radius: 0;
+          padding: 16px 20px;
+        }
+      }
+    </style>
+
+    <script>
+      function scrollToReviews() {
+        const reviewsSection = document.getElementById('reviews-section');
+        if (reviewsSection) {
+          reviewsSection.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      }
+      
+      function openReviewPhoto(photoUrl) {
+        // Primeiro vai para a seção de reviews
+        const reviewsSection = document.getElementById('reviews-section');
+        if (reviewsSection) {
+          reviewsSection.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+          });
+          
+          // Depois de 500ms, procura e clica na foto correspondente para abrir o modal
+          setTimeout(() => {
+            const reviewImages = document.querySelectorAll('#reviews-section .photo img');
+            reviewImages.forEach(img => {
+              if (img.src === photoUrl) {
+                img.click();
+              }
+            });
+          }, 500);
+        }
+      }
+    </script>
+  {% endif %}
+{% endif %}

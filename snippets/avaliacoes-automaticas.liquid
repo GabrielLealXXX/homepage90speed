@@ -1,0 +1,326 @@
+{% comment %}
+  Snippet: avaliacoes-automaticas.liquid
+  Versão Minimalista Clean - Giorno
+  Uso: {% render 'avaliacoes-automaticas', product: product %}
+{% endcomment %}
+
+{%- assign reviews_data = product.metafields.reviews.all_reviews.value -%}
+{%- assign fake_avg_rating = product.metafields.custom.media_das_avaliacoes.value | default: product.metafields.reviews.avg_rating.value -%}
+{%- assign fake_total_count = product.metafields.custom.total_de_avaliacoes.value | default: product.metafields.reviews.total_count.value -%}
+
+{% if reviews_data and fake_avg_rating and fake_total_count %}
+  {%- assign reviews = reviews_data | parse_json -%}
+  
+  <section class="reviews" id="reviews-section">
+    
+    <div class="reviews__header">
+      <h1 style="text-align:center;"> AVALIAÇÕES </h1>
+      <div class="reviews__summary">
+        <div class="score">
+          <span class="score__number">{{ fake_avg_rating }}</span>
+          <div class="score__stars">
+            {%- assign rating_floor = fake_avg_rating | floor -%}
+            {%- assign decimal = fake_avg_rating | minus: rating_floor -%}
+            
+            {%- for i in (1..rating_floor) -%}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+              </svg>
+            {%- endfor -%}
+            
+            {%- if decimal >= 0.75 -%}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+              </svg>
+              {%- assign empty_stars = 4 | minus: rating_floor -%}
+            {%- elsif decimal >= 0.25 -%}
+              <svg width="18" height="18" viewBox="0 0 24 24">
+                <defs>
+                  <linearGradient id="half-star">
+                    <stop offset="50%" stop-color="currentColor"/>
+                    <stop offset="50%" stop-color="transparent"/>
+                  </linearGradient>
+                </defs>
+                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" fill="url(#half-star)" stroke="currentColor"/>
+              </svg>
+              {%- assign empty_stars = 4 | minus: rating_floor -%}
+            {%- else -%}
+              {%- assign empty_stars = 5 | minus: rating_floor -%}
+            {%- endif -%}
+            
+            {%- for i in (1..empty_stars) -%}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+              </svg>
+            {%- endfor -%}
+          </div>
+          <span class="score__count">{{ fake_total_count }} avaliações</span>
+        </div>
+        
+        <div class="distribution">
+          {%- assign fake_total = fake_total_count | times: 1 -%}
+          
+          {%- if fake_avg_rating >= 4.9 -%}
+            {%- assign fake_star_5 = fake_total | times: 0.94 | round -%}
+            {%- assign fake_star_4 = fake_total | times: 0.05 | round -%}
+            {%- assign fake_star_3 = fake_total | times: 0.01 | round -%}
+            {%- assign fake_star_2 = 0 -%}
+          {%- elsif fake_avg_rating >= 4.7 -%}
+            {%- assign fake_star_5 = fake_total | times: 0.8 | round -%}
+            {%- assign fake_star_4 = fake_total | times: 0.16 | round -%}
+            {%- assign fake_star_3 = fake_total | times: 0.03 | round -%}
+            {%- assign fake_star_2 = fake_total | times: 0.01 | round -%}
+          {%- elsif fake_avg_rating >= 4.5 -%}
+            {%- assign fake_star_5 = fake_total | times: 0.65 | round -%}
+            {%- assign fake_star_4 = fake_total | times: 0.28 | round -%}
+            {%- assign fake_star_3 = fake_total | times: 0.05 | round -%}
+            {%- assign fake_star_2 = fake_total | times: 0.02 | round -%}
+          {%- else -%}
+            {%- assign fake_star_5 = fake_total | times: 0.5 | round -%}
+            {%- assign fake_star_4 = fake_total | times: 0.3 | round -%}
+            {%- assign fake_star_3 = fake_total | times: 0.15 | round -%}
+            {%- assign fake_star_2 = fake_total | times: 0.05 | round -%}
+          {%- endif -%}
+          
+          {%- assign fake_star_1 = fake_total | minus: fake_star_5 | minus: fake_star_4 | minus: fake_star_3 | minus: fake_star_2 -%}
+          
+          {%- assign percentage_5 = fake_star_5 | times: 100.0 | divided_by: fake_total | round -%}
+          <div class="bar">
+            <span>5★</span>
+            <div class="track"><div class="fill" style="width: {{ percentage_5 }}%"></div></div>
+            <span>{{ fake_star_5 }}</span>
+          </div>
+          
+          {%- assign percentage_4 = fake_star_4 | times: 100.0 | divided_by: fake_total | round -%}
+          <div class="bar">
+            <span>4★</span>
+            <div class="track"><div class="fill" style="width: {{ percentage_4 }}%"></div></div>
+            <span>{{ fake_star_4 }}</span>
+          </div>
+          
+          {%- assign percentage_3 = fake_star_3 | times: 100.0 | divided_by: fake_total | round -%}
+          <div class="bar">
+            <span>3★</span>
+            <div class="track"><div class="fill" style="width: {{ percentage_3 }}%"></div></div>
+            <span>{{ fake_star_3 }}</span>
+          </div>
+          
+          {%- assign percentage_2 = fake_star_2 | times: 100.0 | divided_by: fake_total | round -%}
+          <div class="bar">
+            <span>2★</span>
+            <div class="track"><div class="fill" style="width: {{ percentage_2 }}%"></div></div>
+            <span>{{ fake_star_2 }}</span>
+          </div>
+          
+          {%- assign percentage_1 = fake_star_1 | times: 100.0 | divided_by: fake_total | round -%}
+          <div class="bar">
+            <span>1★</span>
+            <div class="track"><div class="fill" style="width: {{ percentage_1 }}%"></div></div>
+            <span>{{ fake_star_1 }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="reviews__list" id="reviews-list">
+      {%- for review in reviews limit: 5 -%}
+        <article class="review">
+          <div class="review__header">
+            <div class="author">
+              <div class="avatar">
+                {%- assign name_parts = review.author_name | split: ' ' -%}
+                {%- assign first_initial = name_parts[0] | slice: 0 | upcase -%}
+                {%- assign last_initial = '' -%}
+                {%- if name_parts.size > 1 -%}
+                  {%- assign last_initial = name_parts[-1] | slice: 0 | upcase -%}
+                {%- endif -%}
+                {{ first_initial }}{{ last_initial }}
+              </div>
+              <div>
+                <div class="name-row">
+                  <span class="name">{{ review.author_name }}</span>
+                  {%- if review.verified -%}
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16" class="verified-badge">
+                      <path fill-rule="evenodd" d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd"></path>
+                    </svg>
+                  {%- endif -%}
+                </div>
+                <div class="rating">
+                  {%- for i in (1..review.rating) -%}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                    </svg>
+                  {%- endfor -%}
+                  {%- assign empty = 5 | minus: review.rating -%}
+                  {%- for i in (1..empty) -%}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                    </svg>
+                  {%- endfor -%}
+                </div>
+              </div>
+            </div>
+            <time class="date">
+              {%- assign date_parts = review.date | split: '-' -%}
+              {{ date_parts[2] }}.{{ date_parts[1] }}.{{ date_parts[0] }}
+            </time>
+          </div>
+          
+          <p class="comment">{{ review.body }}</p>
+          
+          {%- if review.photo_url and review.photo_url != '' -%}
+            <div class="photo">
+              <img src="{{ review.photo_url }}" alt="Foto de {{ review.author_name }}" onclick="openModal(this.src)">
+            </div>
+          {%- endif -%}
+        </article>
+      {%- endfor -%}
+    </div>
+    
+    {%- if reviews.size > 5 -%}
+      <button class="more-btn" id="load-more" onclick="loadMore()">Ver mais avaliações</button>
+    {%- endif -%}
+  </section>
+
+  <div id="modal" class="modal" onclick="closeModal()">
+    <img id="modal-img" src="" alt="">
+    <button class="close" onclick="closeModal()">✕</button>
+  </div>
+
+  <style>
+    .reviews { max-width: 1200px; margin: 0px auto; padding: 0 1px; font-family: inherit; }
+    .reviews__header { text-align: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #e5e5e5; }
+    .reviews__logo { height: 48px; margin-bottom: 16px; }
+    .reviews__description { font-size: 14px; color: #666; margin-bottom: 30px; }
+    .reviews__summary { display: flex; gap: 40px; max-width: 600px; margin: 0 auto; }
+    
+    .score { display: flex; align-items: center; gap: 12px; }
+    .score__number { font-size: 36px; font-weight: 600; }
+    .score__stars { display: flex; gap: 2px; color: #F2C832; }
+    .score__count { font-size: 13px; color: #999; }
+    
+    .distribution { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+    .bar { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+    .bar span:first-child { min-width: 24px; color: #666; }
+    .bar span:last-child { min-width: 24px; text-align: right; color: #999; }
+    .track { flex: 1; height: 8px; background: #f5f5f5; }
+    .fill { height: 100%; background: #F2C832; }
+    
+    .reviews__list { margin-top: 5px; }
+    .review { padding: 14px 0; border-bottom: 1px solid #dbdbdb; }
+    .review:last-child { border-bottom: none; }
+    
+    .review__header { display: flex; justify-content: space-between; margin-bottom: 12px; }
+    .author { display: flex; align-items: flex-start; gap: 12px; }
+    .avatar { width: 40px; height: 40px; border-radius: 50%; background: #000; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; flex-shrink: 0; }
+    .name-row { display: flex; align-items: center; gap: 4px; margin-bottom: 4px; }
+    .name { font-size: 14px; font-weight: 500; }
+    .verified-badge { flex-shrink: 0; }
+    .verified { display: inline-flex; align-items: center; gap: 4px; background: #000; color: #fff; padding: 2px 8px; font-size: 10px; }
+    .date { font-size: 12px; color: #999; }
+    
+    .rating { display: flex; gap: 2px; color: #F2C832; }
+    .comment { font-size: 14px; line-height: 1.6; color: #333; margin-left: 52px; }
+    
+    .photo { margin-top: 16px; margin-left: 52px; }
+    .photo img { max-width: 100%; height: auto; cursor: pointer; }
+    
+    .more-btn { display: block; margin: 10px auto 0; padding: 14px 60px; background: #000; color: #fff; border: none; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; }
+    
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 9999; justify-content: center; align-items: center; }
+    .modal.active { display: flex; }
+    .modal img { max-width: 90%; max-height: 90%; }
+    .close { position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 24px; cursor: pointer; }
+    
+    @media (max-width: 768px) {
+      .reviews { margin-bottom: 20px !important; margin-top: -12px;}
+      .reviews__logo { height: 36px; }
+      .reviews__summary { flex-direction: column; align-items: center; gap: 24px; }
+      .score { width: 100%; justify-content: center; }
+      .distribution { width: 100%; max-width: 300px; }
+      .rating, .comment, .photo { margin-left: 0; }
+      .more-btn { width: 100%; }
+    }
+  </style>
+
+  <script>
+    const allReviews = {{ reviews | json }};
+    let currentIndex = 5;
+    
+    function loadMore() {
+      const list = document.getElementById('reviews-list');
+      const btn = document.getElementById('load-more');
+      
+      btn.disabled = true;
+      btn.textContent = 'Carregando...';
+      
+      setTimeout(() => {
+        const endIndex = Math.min(currentIndex + 5, allReviews.length);
+        
+        for (let i = currentIndex; i < endIndex; i++) {
+          const review = allReviews[i];
+          list.insertAdjacentHTML('beforeend', createReviewHTML(review, i + 1));
+        }
+        
+        currentIndex = endIndex;
+        
+        if (currentIndex >= allReviews.length) {
+          btn.style.display = 'none';
+        } else {
+          btn.disabled = false;
+          btn.textContent = 'Ver mais avaliações';
+        }
+      }, 300);
+    }
+    
+    function createReviewHTML(review, index) {
+      const nameParts = review.author_name.split(' ');
+      const initials = (nameParts[0] ? nameParts[0][0] : '') + (nameParts.length > 1 ? nameParts[nameParts.length - 1][0] : '');
+      const date = review.date.split('-').reverse().join('.');
+      
+      let stars = '';
+      for (let i = 0; i < review.rating; i++) {
+        stars += '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>';
+      }
+      for (let i = review.rating; i < 5; i++) {
+        stars += '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>';
+      }
+      
+      const verified = review.verified ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16" class="verified-badge"><path fill-rule="evenodd" d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd"></path></svg>' : '';
+      const photo = review.photo_url ? `<div class="photo"><img src="${review.photo_url}" alt="Foto de ${review.author_name}" onclick="openModal(this.src)"></div>` : '';
+      
+      return `
+        <article class="review">
+          <div class="review__header">
+            <div class="author">
+              <div class="avatar">${initials.toUpperCase()}</div>
+              <div>
+                <div class="name-row">
+                  <span class="name">${review.author_name}</span>
+                  ${verified}
+                </div>
+                <div class="rating">${stars}</div>
+              </div>
+            </div>
+            <time class="date">${date}</time>
+          </div>
+          <p class="comment">${review.body}</p>
+          ${photo}
+        </article>
+      `;
+    }
+    
+    function openModal(src) {
+      document.getElementById('modal-img').src = src;
+      document.getElementById('modal').classList.add('active');
+    }
+    
+    function closeModal() {
+      document.getElementById('modal').classList.remove('active');
+    }
+    
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+  </script>
+{% endif %}

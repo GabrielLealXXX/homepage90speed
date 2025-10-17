@@ -1,0 +1,128 @@
+{% comment %}
+  Snippet: rating-badge
+  Exibe o badge de avaliação com média e quantidade
+  
+  Parâmetros:
+  - product: objeto do produto
+{% endcomment %}
+
+{%- liquid
+  # Tenta usar os metafields CUSTOM diretos primeiro (valores manuais)
+  assign avg_rating = product.metafields.custom.media_das_avaliacoes.value | default: nil
+  assign rating_count = product.metafields.custom.total_de_avaliacoes.value | default: nil
+  assign reviews_list = product.metafields.custom.lista_de_avaliacoes.value
+  
+  # IMPORTANTE: Converte os valores para números se existirem
+  if avg_rating != nil and avg_rating != blank and avg_rating != ""
+    assign avg_rating = avg_rating | times: 1.0
+    assign has_manual_avg = true
+  else
+    assign has_manual_avg = false
+  endif
+  
+  if rating_count != nil and rating_count != blank and rating_count != ""
+    assign rating_count = rating_count | times: 1
+    assign has_manual_count = true
+  else
+    assign has_manual_count = false
+  endif
+  
+  # Se NÃO tiver média manual, calcula baseado na lista
+  if has_manual_avg == false and reviews_list != blank
+    assign total_rating = 0
+    assign valid_reviews = 0
+    
+    for review in reviews_list
+      if review.rating.value != blank
+        assign total_rating = total_rating | plus: review.rating.value
+        assign valid_reviews = valid_reviews | plus: 1
+      endif
+    endfor
+    
+    if valid_reviews > 0
+      assign avg_rating = total_rating | times: 1.0 | divided_by: valid_reviews
+    endif
+  endif
+  
+  # Se NÃO tiver contador manual, usa o tamanho da lista
+  if has_manual_count == false and reviews_list != blank
+    assign rating_count = reviews_list.size
+  endif
+  
+  # Verifica se tem dados para mostrar
+  assign has_reviews = false
+  if rating_count and rating_count > 0 and avg_rating and avg_rating > 0
+    assign has_reviews = true
+  endif
+-%}
+
+{%- if has_reviews -%}
+  <div class="rating-badge" itemscope itemtype="https://schema.org/AggregateRating">
+    <meta itemprop="itemReviewed" content="{{ product.title | escape }}" />
+    <meta itemprop="ratingValue" content="{{ avg_rating | round: 1 }}" />
+    <meta itemprop="reviewCount" content="{{ rating_count }}" />
+    
+    <button 
+  type="button" 
+  class="rating-badge__button"
+  aria-label="{{ avg_rating | round: 1 }} de 5 estrelas, baseado em {{ rating_count }} {% if rating_count == 1 %}avaliação{% else %}avaliações{% endif %}. Clique para ver as avaliações"
+  onclick="document.getElementById('reviews-section')?.scrollIntoView({ behavior: 'smooth' })"
+>
+      {%- render 'stars', rating: avg_rating, size: 'small' -%}
+      <span class="rating-badge__text">
+        <span class="rating-badge__value">{{ avg_rating | round: 1 }}</span>
+        <span class="rating-badge__count">   ({{ rating_count | default: 0 }} Avaliações)</span>
+      </span>
+    </button>
+  </div>
+
+  <style>
+    .rating-badge {
+      margin: 0px 0;
+      display: inline-block;
+    }
+    
+    .rating-badge__button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: none;
+      border: none;
+      padding: 4px 0;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+    }
+    
+    .rating-badge__button:hover {
+      opacity: 0.8;
+    }
+    
+    .rating-badge__button:focus-visible {
+      outline: 2px solid #333;
+      outline-offset: 4px;
+      border-radius: 4px;
+    }
+    
+    .rating-badge__text {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      font-size: 15px;
+      color: #333;
+    }
+    
+    .rating-badge__value {
+      font-weight: 600;
+    }
+    
+    .rating-badge__count {
+      color: #676767;
+    }
+    
+    @media (min-width: 768px) {
+      .rating-badge__text {
+        font-size: 16px;
+      }
+    }
+  </style>
+{%- endif -%}

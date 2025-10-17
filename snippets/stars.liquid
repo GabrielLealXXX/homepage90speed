@@ -1,0 +1,125 @@
+{% comment %}
+  Snippet: stars
+  Renderiza estrelas de avaliação com suporte a meia estrela
+  
+  Parâmetros:
+  - rating: número de 0 a 5 (suporta decimais)
+  - size: tamanho das estrelas (small, medium, large) - padrão: medium
+  - show_number: mostrar número ao lado (true/false) - padrão: false
+  - aria_label: label customizado para acessibilidade
+{% endcomment %}
+
+{%- liquid
+  assign rating = rating | default: 0 | times: 1.0
+  assign size = size | default: 'medium'
+  assign show_number = show_number | default: false
+  assign full_stars = rating | floor
+  assign has_half = false
+  assign empty_stars = 5
+  
+  # Verifica se tem meia estrela
+  assign decimal = rating | minus: full_stars
+  if decimal >= 0.25 and decimal < 0.75
+    assign has_half = true
+    assign empty_stars = 4 | minus: full_stars
+  elsif decimal >= 0.75
+    assign full_stars = full_stars | plus: 1
+    assign empty_stars = 5 | minus: full_stars
+  else
+    assign empty_stars = 5 | minus: full_stars
+  endif
+  
+  # Define o tamanho das estrelas
+  case size
+    when 'small'
+      assign star_size = '18'
+    when 'large'
+      assign star_size = '24'
+    else
+      assign star_size = '20'
+  endcase
+  
+  # Aria label padrão
+  unless aria_label
+    assign aria_label = rating | append: ' de 5 estrelas'
+  endunless
+  
+  # ID único para o gradiente
+  assign unique_id = 'now' | date: '%N'
+-%}
+
+<div class="stars-rating stars-rating--{{ size }}" role="img" aria-label="{{ aria_label }}">
+  <span class="stars-rating__container">
+    {%- for i in (1..full_stars) -%}
+      <svg class="star star--full" width="{{ star_size }}" height="{{ star_size }}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+      </svg>
+    {%- endfor -%}
+    
+    {%- if has_half -%}
+      <svg class="star star--half" width="{{ star_size }}" height="{{ star_size }}" viewBox="0 0 24 24" aria-hidden="true">
+        <defs>
+          <linearGradient id="half-star-{{ unique_id }}">
+            <stop offset="50%" stop-color="currentColor"/>
+            <stop offset="50%" stop-color="#e0e0e0"/>
+          </linearGradient>
+        </defs>
+        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" fill="url(#half-star-{{ unique_id }})"/>
+      </svg>
+    {%- endif -%}
+    
+    {%- for i in (1..empty_stars) -%}
+      <svg class="star star--empty" width="{{ star_size }}" height="{{ star_size }}" viewBox="0 0 24 24" fill="#e0e0e0" aria-hidden="true">
+        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+      </svg>
+    {%- endfor -%}
+  </span>
+  
+  {%- if show_number -%}
+    <span class="stars-rating__number">{{ rating | round: 1 }}</span>
+  {%- endif -%}
+</div>
+
+<style>
+  .stars-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    --star-color: #F2C832;
+  }
+  
+  .stars-rating__container {
+    display: inline-flex;
+    gap: 2px;
+  }
+  
+  .star {
+    flex-shrink: 0;
+  }
+  
+  .star--full {
+    color: var(--star-color);
+  }
+  
+  .star--empty {
+    color: #e0e0e0;
+  }
+  
+  .stars-rating__number {
+    margin-left: 8px;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .stars-rating--small .stars-rating__number {
+    font-size: 14px;
+  }
+  
+  .stars-rating--medium .stars-rating__number {
+    font-size: 16px;
+  }
+  
+  .stars-rating--large .stars-rating__number {
+    font-size: 18px;
+  }
+</style>
