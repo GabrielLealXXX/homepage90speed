@@ -1,0 +1,473 @@
+<!doctype html>
+
+{%- assign direction = 'ltr' -%}
+{%- case request.locale.iso_code -%}
+  {%- when 'ar' or 'arc' or 'dv' or 'fa' or 'ha' or 'he' or 'kwh' or 'ks' or 'ku' or 'ps' or 'ur' or 'yi' -%}
+    {%- assign direction = 'rtl' -%}
+{%- endcase -%}
+
+<html class="no-js" lang="{{ request.locale.iso_code }}" dir="{{ direction }}">
+  <head>
+    {{ content_for_header }}
+    
+    <!-- UTMfy | Script de UTMs (captura gclid/utm_*) -->
+    <!-- ⚠️ ATENÇÃO: Scripts UTMify são externos. Se possível, hospede localmente em /assets/ -->
+    <script
+      src="https://cdn.utmify.com.br/scripts/utms/latest.js"
+      data-utmify-prevent-xcod-sck
+      data-utmify-prevent-subids
+      async
+      defer
+    ></script>
+
+    <script>
+      window.googlePixelId = "68cb0679647490f96daca187";
+      var a = document.createElement("script");
+      a.setAttribute("async", "");
+      a.setAttribute("defer", "");
+      a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel-google.js");
+      document.head.appendChild(a);
+    </script>
+
+    <!-- INICIO ADICIONE SEUS PIXELS AQUI -->
+
+    <!-- Google tag (gtag.js) -->
+    <!-- ⚠️ Google Analytics PRECISA ser externo, não pode ser hospedado localmente -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17412618857"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'AW-17412618857');
+    </script>
+
+    <!-- FIM DO ADICIONE SEUS PIXELS AQUI -->
+    
+    {% render 'sizechartsrelentless' %}
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, height=device-height, minimum-scale=1.0, maximum-scale=5.0">
+    <meta name="theme-color" content="{{ settings.header_background }}">
+
+    {%- if settings.favicon -%}
+      {%- comment -%}✅ CORRIGIDO: img_url → image_url{%- endcomment -%}
+      <link rel="shortcut icon" href="{{ settings.favicon | image_url: width: 96 }}" type="image/png">
+    {%- endif -%}
+
+    <title>{% if page_title == blank %}{{ shop.name }}{% else %}{{ page_title }}{% if current_page != 1 %} &ndash; {{ 'general.meta.page' | t: page: current_page }}{% endif %}{% endif %}</title>
+
+    {%- if page_description -%}
+      <meta name="description" content="{{ page_description | escape }}">
+    {%- endif -%}
+
+    <link rel="canonical" href="{{ canonical_url }}">
+
+    {%- comment -%}Few prefech to increase performance on commonly used third-parties{%- endcomment -%}
+    <link rel="preconnect" href="https://cdn.shopify.com">
+    <link rel="dns-prefetch" href="https://productreviews.shopifycdn.com">
+    <link rel="dns-prefetch" href="https://www.google-analytics.com">
+
+    {%- unless settings.heading_font.system? and settings.text_font.system? -%}
+      <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
+    {%- endunless -%}
+
+    <style>
+  .simple-banner{position:relative;display:block;width:100%;overflow:hidden}
+  .simple-banner__image{width:100%;height:auto;display:block}
+</style>
+
+    {%- comment -%}Inline critical CSS para LCP{%- endcomment -%}
+<link rel="preload" as="style" href="{{ 'theme.min.css' | asset_url }}">
+<link rel="stylesheet" href="{{ 'theme.min.css' | asset_url }}" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="{{ 'theme.min.css' | asset_url }}"></noscript>
+
+{%- comment -%}Scripts com async para não bloquear{%- endcomment -%}
+<script src="{{ 'vendor.js' | asset_url }}" defer></script>
+<script src="{{ 'theme.min.js' | asset_url }}" defer></script>
+
+    {%- comment -%}
+      IMPLEMENTATION NOTE: for improving performance, Focal tries to preload images on known pages (such as blog page,
+      product or collection pages). In order to keep a main JS file size minimal, the theme also lazyloads non-essential
+      libraries (such as PhotoSwipe or Flickity) and only loads them on demand.
+    {%- endcomment -%}
+    
+    {%- if request.page_type == 'product' -%}
+      {%- assign selected_media = product.selected_variant.featured_media | default: product.featured_media -%}
+
+      <link rel="preload" as="fetch" href="{{ product.url }}.js" crossorigin>
+      
+      {%- comment -%}✅ CORRIGIDO: Usando image_tag com preload{%- endcomment -%}
+      {%- if selected_media -%}
+        {{ selected_media | image_url: width: 1800 | image_tag: loading: 'eager', preload: true, widths: '400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600,1700,1800', class: 'visually-hidden' }}
+      {%- endif -%}
+
+      {%- if product.media.size > 1 -%}
+        <script src="{{ 'flickity.js' | asset_url }}" defer></script>
+      {%- endif -%}
+    {%- elsif request.page_type == 'collection' and collection.image -%}
+      {%- comment -%}✅ CORRIGIDO: Usando image_tag com preload para imagens de coleção{%- endcomment -%}
+      {{ collection.image | image_url: width: 2600 | image_tag: loading: 'eager', preload: true, widths: '400,500,600,700,800,900,1000,1200,1400,1600,1800,2000,2200,2400,2600', class: 'visually-hidden' }}
+    {%- endif -%}
+
+    {%- comment -%}✅ OTIMIZADO: Preload agressivo do hero banner{%- endcomment -%}
+    {%- if request.page_type == 'index' -%}
+      {%- for section in sections -%}
+        {%- if section.type == 'editorial-campaign' and section.settings.is_hero_banner == true -%}
+          {%- if section.settings.image_desktop != blank -%}
+            {%- comment -%}Preload WebP para navegadores modernos{%- endcomment -%}
+            <link 
+              rel="preload" 
+              as="image" 
+              type="image/webp"
+              href="{{ section.settings.image_desktop | image_url: width: 1920, format: 'pjpg' }}" 
+              imagesrcset="{{ section.settings.image_desktop | image_url: width: 1920, format: 'pjpg' }} 1920w,
+                           {{ section.settings.image_desktop | image_url: width: 1440, format: 'pjpg' }} 1440w"
+              imagesizes="100vw"
+              fetchpriority="high">
+            
+            {%- comment -%}Fallback para navegadores sem WebP{%- endcomment -%}
+            <link 
+              rel="preload" 
+              as="image" 
+              href="{{ section.settings.image_desktop | image_url: width: 1920 }}" 
+              imagesrcset="{{ section.settings.image_desktop | image_url: width: 1920 }} 1920w,
+                           {{ section.settings.image_desktop | image_url: width: 1440 }} 1440w"
+              imagesizes="100vw">
+          {%- endif -%}
+          {%- break -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endif -%}
+
+    {% render 'social-meta-tags' %}
+    {% render 'microdata-schema' %}
+    {% render 'css-variables', direction: direction %}
+    {% render 'js-variables', direction: direction %}
+
+    {%- comment -%}✅ CSS já carregado com preload acima{%- endcomment -%}
+
+    {%- comment -%}✅ FONT AWESOME - AGORA LOCAL{%- endcomment -%}
+    {{ 'font-awesome.min.css' | asset_url | stylesheet_tag }}
+    
+    <script src="{{ 'custom.js' | asset_url }}" defer></script>
+
+    {%- comment -%}✅ CORRIGIDO: include → render{%- endcomment -%}
+    {% render 'setbg' %}
+
+    {% render 'visionlcp' %}
+
+    <!-- INICIO DOS BLOQUEADORES -->
+  
+    {% if settings.ali_hunter_enable %}
+      {% render 'blockalihtr' %}
+    {% endif %}
+    
+    {% if settings.botao_direito_enable %}
+      <script type="text/javascript">
+        var message="Desculpe, o clique com o botão direito foi desativado.";
+        function clickIE() {if (document.all) {(message);return false;}}
+        function clickNS(e) {if
+        (document.layers||(document.getElementById&&!document.all)) {
+          if (e.which==2||e.which==3) {(message);return false;}}}
+        if (document.layers)
+        {document.captureEvents(Event.MOUSEDOWN);document.onmousedown=clickNS;}
+        else{document.onmouseup=clickNS;document.oncontextmenu=clickIE;}
+        document.oncontextmenu=new Function("return false")
+      </script>
+    {% endif %}
+
+    {% if settings.atalho_f12_enable %}
+      <script>
+        document.onkeydown = function(e) {
+          if(event.keyCode == 123) {
+            return false;
+          }
+          if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)){
+            return false;
+          }
+          if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)){
+            return false;
+          }
+          if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)){
+            return false;
+          }
+        }
+      </script>
+    {% endif %}
+
+    {% if settings.selecionar_conteudo_enable %}
+      <script>
+        function disableselect(e) {
+          return false;
+        }
+
+        function reEnable() {
+          return true;
+        }
+
+        document.onselectstart = new Function("return false");
+
+        if (window.sidebar) {
+          document.onmousedown = disableselect;
+          document.onclick = reEnable;
+        }
+      </script>
+    {% endif %}    
+
+  </head>
+
+  {%- assign feature_classes = '' -%}
+
+  {%- if settings.show_image_zoom -%}
+    {% assign feature_classes = feature_classes | append: ' features--image-zoom' %}
+  {%- endif -%}
+
+  <body class="no-focus-outline {{ feature_classes }}" data-instant-allow-query-string>
+
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K98VJTJ7"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    {%- comment -%}Common SVG definitions that we are re-using in several places{%- endcomment -%}
+    <svg class="visually-hidden">
+      <linearGradient id="rating-star-gradient-half">
+        <stop offset="50%" stop-color="rgb(var(--product-star-rating))" />
+        <stop offset="50%" stop-color="rgb(var(--product-star-rating))" stop-opacity="0.4" />
+      </linearGradient>
+    </svg>
+
+    {%- comment -%}✅ JQUERY - AGORA LOCAL{%- endcomment -%}
+    <script src="{{ 'jquery-3.6.0.min.js' | asset_url }}" defer></script>
+   
+    <a href="#main" class="visually-hidden skip-to-content">{{ 'general.accessibility.skip_to_content' | t }}</a>
+    <loading-bar class="loading-bar"></loading-bar>
+
+    {%- if request.page_type != 'gift_card' and request.page_type != 'password' -%}
+      {%- section 'announcement-bar' -%}
+      {%- section 'popup' -%}
+      {%- section 'header' -%}
+
+      {%- unless settings.cart_type == 'page' or request.page_type == 'cart' -%}
+        {%- section 'mini-cart' -%}
+      {%- endunless -%}
+    {%- endif -%}
+
+    <div id="main" role="main" class="anchor">
+      {%- comment -%}
+      IMPLEMENTATION NOTE: on collection and search page, the theme was designed to show on mobile the filter bar and/or sort
+        by at the very top of the page. However, due to the fact that sections are isolated, I had to move the code
+        here. Then, the collection section, based on the selected settings, will eventually hide those elements in CSS
+      {%- endcomment -%}
+      {%- if request.page_type == 'collection' or request.page_type == 'search' -%}
+        {%- assign active_filters_count = 0 -%}
+
+        {%- if request.page_type == 'collection' -%}
+          {%- assign filters = collection.filters -%}
+        {%- else -%}
+          {%- assign filters = search.filters -%}
+        {%- endif -%}
+
+        {%- for filter in filters -%}
+          {%- if filter.type == 'list' -%}
+            {%- assign active_filters_count = active_filters_count | plus: filter.active_values.size -%}
+          {%- elsif filter.type == 'price_range' and filter.min_value.value or filter.max_value.value -%}
+            {%- assign active_filters_count = active_filters_count | plus: 1 -%}
+          {%- endif -%}
+        {%- endfor -%}
+
+        {%- assign is_toolbar_collapsed = false -%}
+
+        {%- if request.page_type == 'search' and search.results.first.object_type != 'product' and search.results_count > 0 -%}
+          {%- assign is_toolbar_collapsed = true -%}
+        {%- endif -%}
+
+        <div id="mobile-facet-toolbar" class="mobile-toolbar {% if is_toolbar_collapsed %}is-collapsed{% endif %} hidden-lap-and-up">
+          <button is="toggle-button" class="mobile-toolbar__item mobile-toolbar__item--filters {% if active_filters_count > 0 %}has-filters{% endif %}" aria-expanded="false" aria-controls="facet-filters" style="display: none">
+            {%- render 'icon' with 'filters' -%}
+            <span class="mobile-toolbar__item-label">{{- 'collection.general.filters' | t -}}</span>
+          </button>
+
+          <button is="toggle-button" class="mobile-toolbar__item mobile-toolbar__item--sort" aria-expanded="false" aria-controls="sort-by-popover" style="display: none">
+            <span class="mobile-toolbar__item-label">{{- 'collection.general.sort_by' | t -}}</span>
+            {%- render 'icon' with 'chevron' -%}
+          </button>
+        </div>
+      {%- endif -%}
+
+      {{ content_for_layout }}
+
+      {%- unless request.page_type == 'index' or request.page_type == 'password' or request.page_type == 'gift_card' -%}
+        {%- section 'static-text-with-icons' -%}
+        {%- section 'static-newsletter' -%}
+      {%- endunless -%}
+    </div>
+            
+    {%- comment -%}
+    ⚠️ IONICONS - OPÇÃO 1 (RECOMENDADO): Baixe e hospede localmente
+    1. Baixe os arquivos do Ionicons
+    2. Coloque em /assets/
+    3. Substitua as linhas abaixo pela importação local
+    
+    ⚠️ OPÇÃO 2 (TEMPORÁRIA): Mantenha o CDN até hospedar localmente
+    {%- endcomment -%}
+    <script defer type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script defer nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+    {%- if request.page_type != 'gift_card' and request.page_type != 'password' -%}
+      {%- section 'footer' -%}
+    {%- endif -%}
+
+    {%- if settings.show_sticky_whats -%}
+      {% render 'stickywhats' %}
+    {%- endif -%}
+
+    <style>
+      .shopify-payment-button {
+        display: none !important;
+      }
+    </style>
+
+    <!-- start vega utm script -->
+    <div id='foxScriptUtm'>
+      <script>
+        var url_string = window.location.href;
+        var url = new URL(url_string);
+        var utmParams = {
+          src: url.searchParams.get('src'),
+          utm_source: url.searchParams.get('utm_source'),
+          utm_medium: url.searchParams.get('utm_medium'),
+          utm_campaign: url.searchParams.get('utm_campaign'),
+          utm_term: url.searchParams.get('utm_term'),
+          utm_content: url.searchParams.get('utm_content')
+        }
+        var cookieValue = '';
+        Object.keys(utmParams).forEach(function(key) {
+          if(utmParams[key]){
+            if(cookieValue) {
+              cookieValue += '|';
+            }
+            cookieValue += key + '=' + utmParams[key];
+          }
+        });
+
+        if(cookieValue) {
+          var cookieName = '_sirius_track';
+          var myDate = new Date();
+          myDate.setMonth(myDate.getMonth() + 12);
+          document.cookie = cookieName +'=' + cookieValue + ';domain=.giornobrasil.com.br;path=/;expires=' + myDate.toUTCString();
+        }
+      </script>
+    </div>
+    <!-- end vega utm script -->
+    
+    <!-- start vega cart script -->
+    <div id="foxScriptCart">
+      <script defer>
+        function inArray(needle, haystack) {
+          var length = haystack.length;
+          for(var i = 0; i < length; i++) {
+            if(haystack[i] == needle) return true;
+          }
+          return false;
+        }
+
+        function setFormDataCloudfoxCheckout(method = "POST") {
+          const urlCloudfoxCheckout = 'https://pay.giornobrasil.com.br';
+          let form = document.querySelector(`form[action="${urlCloudfoxCheckout}"]`);
+
+          if(form === null) {
+            form = document.querySelector('form[action="{{ routes.cart_url }}"]');
+            form.setAttribute('action', urlCloudfoxCheckout);
+          }
+
+          if(!form.hasAttribute('method')) form.setAttribute('method', method);
+          if(!form.hasAttribute('novalidate')) form.setAttribute('novalidate','novalidate');
+          if(!form.hasAttribute('data-fox')) form.setAttribute('data-fox', 'cart-form');
+
+          return form;
+        }
+
+        function createInputDataFox(name, loopIndex, value, dataFoxNumber, type = 'hidden') {
+          const element = document.createElement('input');
+          element.setAttribute('type', type);
+          element.setAttribute('data-fox', dataFoxNumber);
+          element.setAttribute('name',`${name}${loopIndex}`);
+          element.setAttribute('value',`${value}`);
+          return element;
+        }
+
+        function submitCheckout(formElement) {
+          const themeName = "{{ theme.name }}";
+          const theme = themeName.toLowerCase();
+          const divFoxData = document.createElement('div');
+          divFoxData.setAttribute('id', 'foxData');
+
+          if(theme == 'warehouse') {
+            {% for line_item in cart.items %}
+              const productId = createInputDataFox('product_id_', {{ forloop.index }}, '{{ line_item.id }}', 1);
+              const variantId = createInputDataFox('variant_id_', {{ forloop.index }}, '{{ line_item.variant_id }}', 2);
+              const productPrice = createInputDataFox('product_price_', {{ forloop.index }}, '{{ line_item.price }}', 3);
+              const productImage = createInputDataFox('product_image_', {{ forloop.index }}, '{{ line_item.image }}', 4);
+              const productAmount = createInputDataFox('product_amount_', {{ forloop.index }}, '{{ line_item.quantity }}', 5);
+              divFoxData.append(productId, variantId, productPrice, productImage, productAmount);
+            {% endfor %}
+          } else {
+            {% for item in cart.items %}
+              const productId = createInputDataFox('product_id_', {{ forloop.index }}, '{{ item.id }}', 1);
+              const variantId = createInputDataFox('variant_id_', {{ forloop.index }}, '{{ item.variant_id }}', 2);
+              const productPrice = createInputDataFox('product_price_', {{ forloop.index }}, '{{ item.price }}', 3);
+              const productImage = createInputDataFox('product_image_', {{ forloop.index }}, '{{ item.image }}', 4);
+              const productAmount = createInputDataFox('product_amount_', {{ forloop.index }}, '{{ item.quantity }}', 5);
+              divFoxData.append(productId, variantId, productPrice, productImage, productAmount);
+            {% endfor %}
+          }
+
+          const form = setFormDataCloudfoxCheckout();
+          form.appendChild(divFoxData);
+          console.log(form);
+          form.submit();
+        }
+
+        console.log('{{ template.name }}');
+
+        let form = document.querySelector('form[action="{{ routes.cart_url }}"]');
+        if(form !== null) {
+          form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            console.log(this);
+            submitCheckout(this);
+          });
+        }
+
+        let buttonSubmit = document.querySelector('button[form]');
+        if(buttonSubmit !== null) {
+          buttonSubmit.addEventListener('click', function (e) {
+            e.preventDefault();
+            console.log(form);
+            submitCheckout(form);
+          });
+        }
+      </script>
+    </div>
+    <!-- end vega cart script -->
+    
+    <!-- start vega skip to cart script -->
+    <script>
+      if(document.querySelector('button[name="add"]')) {
+        let buyNowButton = document.querySelector('button[name="add"]');
+        buyNowButton.querySelector("span").innerText = 'Comprar Agora'
+      }
+
+      if(document.cookie.match(new RegExp('cart=([^;]+)')) && form !== null) {
+        document.getElementsByTagName('body').item(0).style.display = 'none';
+        var htmlData = "<div><style>@keyframes loader-circle{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}.loader-container{height:100vh;text-align:center;padding-top:40vh}.loader{width:75px;height:75px;display:inline-block;border-top:solid #d3d3d3;border-right:solid #d3d3d3;border-bottom:solid #d3d3d3;border-left:solid #557b96;border-width:5px;border-radius:50%;animation:loader-circle 1.1s infinite linear}</style><div class='loader-container'><div class='loader'></div></div></div>";
+        document.getElementsByTagName('html').item(0).insertAdjacentHTML( 'beforeend', htmlData);
+        submitCheckout(form);
+        document.cookie = 'cart=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      }
+    </script>
+    <!-- end vega skip to cart script -->
+    
+  </body>
+</html>
